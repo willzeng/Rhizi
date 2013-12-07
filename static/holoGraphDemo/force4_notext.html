@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<head>
+  <script src="http://d3js.org/d3.v3.min.js"></script>
+
+  <style>
+
+.node {
+  stroke: #fff;
+  stroke-width: 1.5px;
+}
+
+.link {
+  stroke: #999;
+  stroke-opacity: .6;
+}
+  </style>
+</head>
+<body style="background-color:black">
+<div id="chart" style="border:1px solid gray; float:left;background:black">
+</div>
+
+<script type="text/javascript" src="fisheye.js"></script> 
+<script>
+
+var width = 960,
+    height = 500;
+
+var pan = [0, 0]; // pan to a node
+var trans = [0, 0]; // translation from zooming
+var scale = 1;
+
+
+var fisheye = d3.fisheye()
+    .radius(50)
+    .power(2);
+
+var color = d3.scale.category20();
+
+var force = d3.layout.force()
+    .charge(-120)
+    .linkDistance(50)
+    .size([width, height]);
+
+/*
+var vis = d3.select("#chart")
+  .append("svg:svg")
+    .attr("width", w)
+    .attr("height", h)
+    .attr("pointer-events", "all")
+  .append('svg:g')
+    .call(d3.behavior.zoom().on("zoom", redraw))
+  .append('svg:g');
+
+vis.append('svg:rect')
+    .attr('width', w)
+    .attr('height', h)
+    .attr('fill', 'white');
+
+*/
+
+var svgContainer = d3.select("#chart").append("svg:svg")
+      .attr("width", width)
+      .attr("height", height)
+    .attr("pointer-events", "all")
+  .append('svg:g')
+    .call(d3.behavior.zoom().on("zoom", redraw))
+
+
+var svgG = svgContainer.append("svg:g");
+
+
+svgG.append('svg:rect')
+    .attr('width', width)
+    .attr('height', height)
+    .attr('fill', 'black');
+
+/*d3.select("body").onmousemove = function() {
+  console.log("movement");
+}*/
+
+/*svg.append("circle")
+                          .attr("cx", width/2)
+                         .attr("cy", height/2)
+                         .attr("r", 20)
+                         .style("fill","rgb(255,0,0)");
+                         */
+
+drawXHairs(width/2,height/2);
+
+
+svgG.on("mousemove", function() {
+
+  fisheye.center(d3.mouse(this));
+
+
+  var d=this;
+
+  svgG.selectAll('.node')
+  .each(function(d) { d.display = fisheye(d); })
+  .attr("r", function(d) { return d.display.z * 4.5; });
+
+  //console.log(d)
+  return;
+  var x_center = width / 2;
+  var y_center = height / 2;
+
+  var dx = d.x - x_center;
+  var dy = d.y - y_center;
+
+  svgG.selectAll('.node')
+    .update()
+    .each(function(d) { d.display = fisheye(d); })
+    
+      .attr('cx', function(curr) { return curr.x - dx }) // x attribute
+      .attr('cy', function(curr) { return curr.y - dy })
+      .attr("r", function(d) { return d.display.z * 4.5; });
+
+});
+
+d3.json("data.json", function(error, graph) {
+  force
+      .nodes(graph.nodes)
+      .links(graph.links)
+      .start();
+
+  var link = svgG.selectAll(".link")
+      .data(graph.links)
+    .enter().append("line")
+      .attr("class", "link")
+      .style("stroke-width", function(d) { return Math.sqrt(d.value); });
+
+  var node = svgG.selectAll(".node")
+      .data(graph.nodes)
+    .enter().append("circle")
+      .on("mouseover", translate)
+      .attr("class", "node")
+      .attr("r", 5)
+      .style("fill", function(d) { return color(d.group); })
+      .call(force.drag);
+
+  node.append("title")
+      .text(function(d) { return d.name; });
+
+  force.on("tick", function() {
+    link.attr("x1", function(d) { return d.source.x; })
+        .attr("y1", function(d) { return d.source.y; })
+        .attr("x2", function(d) { return d.target.x; })
+        .attr("y2", function(d) { return d.target.y; });
+
+    node.attr("cx", function(d) { return d.x; })
+        .attr("cy", function(d) { return d.y; });
+  });
+
+});
+
+
+function drawXHairs(x,y) {
+
+svgContainer.append("line")
+                        .attr("x1", x)
+                        .attr("x2", x)
+                        .attr("y1", y-10)
+                        .attr("y2", y+10)
+                        .attr("stroke-width", 2)
+                        .attr("stroke", "red");
+svgContainer.append("line")
+                        .attr("x1", x+10)
+                        .attr("x2", x-10)
+                        .attr("y1", y)
+                        .attr("y2", y)
+                        .attr("stroke-width", 2)
+                        .attr("stroke", "red");
+}
+
+function translate() {
+  // pan that node to the center
+  var x = this.cx.animVal.value, y = this.cy.animVal.value;
+ // d3.select(this).transition().attr("r",7)
+  pan[0] = -x;
+  pan[1] = -y;
+  console.log("trans",width/2,height/2)
+  console.log(x,y)
+ // drawXHairs(x,y)
+  redraw();
+}
+
+function redraw() {
+  if(d3.event.translate){
+    // zoom
+    trans = d3.event.translate;
+    scale = d3.event.scale;
+  }
+  console.log("redraw",trans,scale);
+  var translate = [
+     pan[0] + width/scale/2,
+    pan[1] + height/scale/2
+  ];
+/*
+translate = [
+     trans[0],trans[1],
+  ];
+*/
+
+  svgG.transition().ease("linear").attr("transform",
+      "scale(" + scale + ") "
+      + "translate(" + translate + ")");
+  /*
+  svgContainer.transition().attr("transform",
+      "translate(" + translate + ")"
+      + " scale(" + scale + ")");
+      */
+}
+
+</script>
+
