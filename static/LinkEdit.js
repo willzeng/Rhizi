@@ -60,7 +60,11 @@
               } else {
                 makeLinks = value;
               }
-              return $("<div class=\"node-profile-property\">" + property + ": " + makeLinks + "</div>").appendTo($linkDiv);
+              if (property === "_Creation_Date" || "_Last_Edit_Date") {
+                return $("<div class=\"node-profile-property\">" + property + ": " + (makeLinks.substring(4, 21)) + "</div>").appendTo($linkDiv);
+              } else {
+                return $("<div class=\"node-profile-property\">" + property + ": " + makeLinks + "</div>").appendTo($linkDiv);
+              }
             }
           });
           $linkEdit = $("<input id=\"LinkEditButton" + link['_id'] + "\" class=\"LinkEditButton\" type=\"button\" value=\"Edit this link\">").appendTo($linkDiv);
@@ -78,7 +82,7 @@
         linkDiv.html("<div class=\"node-profile-title\">Editing " + (this.findHeader(link)) + "</div><form id=\"Link" + link['_id'] + "EditForm\"></form>");
         _.each(link, function(value, property) {
           var newEditingFields;
-          if (blacklist.indexOf(property) < 0 && ["_id", "Last_Edit_Date", "Creation_Date", "start", "end"].indexOf(property) < 0) {
+          if (blacklist.indexOf(property) < 0 && ["_id", "_Last_Edit_Date", "_Creation_Date", "start", "end"].indexOf(property) < 0) {
             newEditingFields = "<div id=\"Link" + link['_id'] + "EditDiv" + linkInputNumber + "\" class=\"Link" + link['_id'] + "EditDiv\">\n  <input style=\"width:80px\" id=\"Link" + link['_id'] + "EditProperty" + linkInputNumber + "\" value=\"" + property + "\" class=\"propertyLink" + link['_id'] + "Edit\"/> \n  <input style=\"width:80px\" id=\"Link" + link['_id'] + "EditValue" + linkInputNumber + "\" value=\"" + value + "\" class=\"valueLink" + link['_id'] + "Edit\"/> \n  <input type=\"button\" id=\"removeLink" + link['_id'] + "Edit" + linkInputNumber + "\" value=\"x\" onclick=\"this.parentNode.parentNode.removeChild(this.parentNode);\">\n</div>";
             $(newEditingFields).appendTo("#Link" + link['_id'] + "EditForm");
             return linkInputNumber = linkInputNumber + 1;
@@ -96,6 +100,7 @@
           if (newLinkObj[0]) {
             newLink = newLinkObj[1];
             newLink['_id'] = link['_id'];
+            newLink['_Creation_Date'] = link['_Creation_Date'];
             return _this.dataController.linkEdit(link, newLink, function(savedLink) {
               savedLink['_id'] = link['_id'];
               savedLink['_type'] = link['_type'];

@@ -48,7 +48,10 @@ define [], () ->
               makeLinks = value.replace(/((https?|ftp|dict):[^'">\s]+)/gi,"<a href=\"$1\" target=\"_blank\" style=\"target-new: tab;\">$1</a>")
             else
               makeLinks = value
-            $("<div class=\"node-profile-property\">#{property}: #{makeLinks}</div>").appendTo $linkDiv
+            if property=="_Creation_Date" or "_Last_Edit_Date"
+              $("<div class=\"node-profile-property\">#{property}: #{makeLinks.substring(4,21)}</div>").appendTo $linkDiv
+            else
+              $("<div class=\"node-profile-property\">#{property}: #{makeLinks}</div>").appendTo $linkDiv
         
 
         $linkEdit = $("<input id=\"LinkEditButton#{link['_id']}\" class=\"LinkEditButton\" type=\"button\" value=\"Edit this link\">").appendTo $linkDiv
@@ -61,7 +64,7 @@ define [], () ->
           linkInputNumber = 0
           linkDiv.html("<div class=\"node-profile-title\">Editing #{@findHeader(link)}</div><form id=\"Link#{link['_id']}EditForm\"></form>")
           _.each link, (value, property) ->
-            if blacklist.indexOf(property) < 0 and ["_id", "Last_Edit_Date", "Creation_Date", "start", "end"].indexOf(property) <0
+            if blacklist.indexOf(property) < 0 and ["_id", "_Last_Edit_Date", "_Creation_Date", "start", "end"].indexOf(property) <0
               newEditingFields = """
                 <div id=\"Link#{link['_id']}EditDiv#{linkInputNumber}\" class=\"Link#{link['_id']}EditDiv\">
                   <input style=\"width:80px\" id=\"Link#{link['_id']}EditProperty#{linkInputNumber}\" value=\"#{property}\" class=\"propertyLink#{link['_id']}Edit\"/> 
@@ -85,6 +88,7 @@ define [], () ->
             if newLinkObj[0]
               newLink = newLinkObj[1]
               newLink['_id'] = link['_id']
+              newLink['_Creation_Date'] = link['_Creation_Date']
               @dataController.linkEdit(link, newLink, (savedLink) =>
                 savedLink['_id'] = link['_id']
                 savedLink['_type'] = link['_type']
