@@ -45,7 +45,7 @@ define [], () ->
             makeLinks = value
           if property=="color"
             $("<div class=\"node-profile-property\">#{property}:  #{colors[hexColors.indexOf(makeLinks.toUpperCase())]}</div>").appendTo $nodeDiv 
-          else if property=="_Creation_Date" or "_Last_Edit_Date"
+          else if property == "_Last_Edit_Date" or property=="_Creation_Date"
             $("<div class=\"node-profile-property\">#{property}:  #{makeLinks.substring(4,21)}</div>").appendTo $nodeDiv
           else
             $("<div class=\"node-profile-property\">#{property}:  #{makeLinks}</div>").appendTo $nodeDiv  
@@ -160,7 +160,7 @@ define [], () ->
         if blacklist.indexOf(property) < 0
           if property=="color"
             $("<div class=\"node-profile-property\">#{property}:  #{colors[hexColors.indexOf(value.toUpperCase())]}</div>").appendTo nodeDiv 
-          else if property=="_Creation_Date" or "_Last_Edit_Date"
+          else if property == "_Last_Edit_Date" or property=="_Creation_Date"
             $("<div class=\"node-profile-property\">#{property}:  #{value.substring(4,21)}</div>").appendTo nodeDiv
           else
             $("<div class=\"node-profile-property\">#{property}:  #{value}</div>").appendTo nodeDiv  

@@ -63,7 +63,7 @@
             }
             if (property === "color") {
               return $("<div class=\"node-profile-property\">" + property + ":  " + colors[hexColors.indexOf(makeLinks.toUpperCase())] + "</div>").appendTo($nodeDiv);
-            } else if (property === "_Creation_Date" || "_Last_Edit_Date") {
+            } else if (property === "_Last_Edit_Date" || property === "_Creation_Date") {
               return $("<div class=\"node-profile-property\">" + property + ":  " + (makeLinks.substring(4, 21)) + "</div>").appendTo($nodeDiv);
             } else {
               return $("<div class=\"node-profile-property\">" + property + ":  " + makeLinks + "</div>").appendTo($nodeDiv);
@@ -223,7 +223,7 @@
           if (blacklist.indexOf(property) < 0) {
             if (property === "color") {
               return $("<div class=\"node-profile-property\">" + property + ":  " + colors[hexColors.indexOf(value.toUpperCase())] + "</div>").appendTo(nodeDiv);
-            } else if (property === "_Creation_Date" || "_Last_Edit_Date") {
+            } else if (property === "_Last_Edit_Date" || property === "_Creation_Date") {
               return $("<div class=\"node-profile-property\">" + property + ":  " + (value.substring(4, 21)) + "</div>").appendTo(nodeDiv);
             } else {
               return $("<div class=\"node-profile-property\">" + property + ":  " + value + "</div>").appendTo(nodeDiv);
