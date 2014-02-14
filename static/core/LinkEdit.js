@@ -62,7 +62,11 @@
               } else {
                 makeLinks = value;
               }
-              return $("<div class=\"node-profile-property\">" + property + ": " + makeLinks + "</div>").appendTo($linkDiv);
+              if (property === "_Creation_Date" || "_Last_Edit_Date") {
+                return $("<div class=\"node-profile-property\">" + property + ": " + (makeLinks.substring(4, 21)) + "</div>").appendTo($linkDiv);
+              } else {
+                return $("<div class=\"node-profile-property\">" + property + ": " + makeLinks + "</div>").appendTo($linkDiv);
+              }
             }
           });
           $linkEdit = $("<input id=\"LinkEditButton" + link['_id'] + "\" class=\"LinkEditButton\" type=\"button\" value=\"Edit this link\">").appendTo($linkDiv);
@@ -98,6 +102,7 @@
           if (newLinkObj[0]) {
             newLink = newLinkObj[1];
             newLink['_id'] = link['_id'];
+            newLink['_Creation_Date'] = link['_Creation_Date'];
             return _this.dataController.linkEdit(link, newLink, function(savedLink) {
               savedLink['_id'] = link['_id'];
               savedLink['_type'] = link['_type'];

@@ -3,11 +3,13 @@ define [], () ->
 
   class NodeEdit extends Backbone.View
 
+    colors = ["darkgray", "aqua", "black", "blue", "darkblue", "fuchsia", "green", "darkgreen", "lime", "maroon", "navy", "olive", "orange", "purple", "red", "silver", "teal", "yellow"]
+    hexColors = ["#A9A9A9","#00FFFF","#000000","#0000FF", "#00008B","#FF00FF","#008000","#006400","#00FF00","#800000","#000080","#808000","#FFA500","#800080","#FF0000","#C0C0C0","#008080","#FFFF00"]
+  
     constructor: (@options) ->
       super()
 
     init: (instances) ->
-      
       #require plugins
       @dataController = instances['local/Neo4jDataController']
 
@@ -32,14 +34,13 @@ define [], () ->
         @renderProfile(node, $nodeDiv, blacklist) 
 
     editNode: (node, nodeDiv, blacklist) ->
+          console.log node.color
           console.log "Editing node: " + node['_id']
           nodeInputNumber = 0
 
           #TODO these color settings should probably go in a settings plugin
           origColor = "#A9A9A9" #TODO: map this to the CSS file color choice for node color
-          colors = ["darkgray", "aqua", "black", "blue", "darkblue", "fuchsia", "green", "darkgreen", "lime", "maroon", "navy", "olive", "orange", "purple", "red", "silver", "teal", "yellow"]
-          hexColors = ["#A9A9A9","#00FFFF","#000000","#0000FF", "#00008B","#FF00FF","#008000","#006400","#00FF00","#800000","#000080","#808000","#FFA500","#800080","#FF0000","#C0C0C0","#008080","#FFFF00"]
-          
+
           header = @findHeader(node)
 
           nodeDiv.html("<div class=\"node-profile-title\">Editing #{header} (id: #{node['_id']})</div><form id=\"Node#{node['_id']}EditForm\"></form>")
@@ -101,6 +102,7 @@ define [], () ->
     cancelEditing: (node, nodeDiv, blacklist) =>
       nodeDiv.empty()
       @renderProfile(node, nodeDiv, blacklist)
+
 
     deleteNode: (delNode, callback)=>
       @dataController.nodeDelete delNode, (response) =>
